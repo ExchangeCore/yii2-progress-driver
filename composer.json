@@ -1,0 +1,22 @@
+{
+    "name": "exchangecore/yii2-progress-driver",
+    "description": "A Yii2 driver for Progress OpenEdge",
+    "keywords": [
+        "yii2",
+        "openedge"
+    ],
+    "homepage": "http://www.exchangecore.com",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/ExchangeCore/yii2-progress-driver/issues",
+        "source": "https://github.com/ExchangeCore/yii2-progress-driver"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {"exchangecore\\yii2\\progress\\driver\\": "src/"}
+    }
+}
