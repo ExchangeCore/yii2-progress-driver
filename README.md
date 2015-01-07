@@ -43,10 +43,12 @@ will now need to use the modified connection class. Here is a sample of connecti
 
 ### Handling Primary Keys
 
-As of right now I have yet to find a way to determine the primary keys for a table from an ODBC call. This means that
-for those of you who are planning on using this for things like ActiveRecord, you will need to manually define a primary
-key in your Models. This can be done by simply overwriting the function with an array of fields that make up the primary
-key for that table. Example:
+Because Progress does not use primary keys as constraints or unique identifiers the driver makes a best guess at what
+might actually be a primary key constraint and what probably isn't. It does this by checking for a key marked as primary
+and unique; if it is primary but not unique it will not be treated as a primary key. Because it's possible that not
+every table will have a primary key you may need to add one manually to your model in order to leverage certain Yii
+functionality. Additionally, if you find the driver has inaccurately determined a primary key you may need to set it
+manually. Example of manually setting a primary key in a model:
 
 ```
     /**
