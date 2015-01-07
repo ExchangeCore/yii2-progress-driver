@@ -234,7 +234,53 @@ class Schema extends yii\db\Schema
      */
     protected function findPrimaryKeys($table)
     {
-        //progress doesn't have a way to determine primary keys created with ABL
+        $primeIndex = $this->db->createCommand(
+            'SELECT "_Prime-Index"
+            FROM "_File"
+            WHERE "_File-Name" = :tableName
+            ',
+            [':tableName' => $table->name]
+        )->queryScalar();
+        if (is_null($primeIndex)) {
+            return;
+        }
+
+        $index = $this->db->createCommand(
+            'SELECT ROWID
+            FROM "_Index"
+            WHERE ROWID = :primeIndex AND "_Unique" = 1
+            ',
+            [':primeIndex' => $primeIndex]
+        )->queryScalar();
+        if (is_null($index)) {
+            return;
+        }
+
+        $fieldRecs = $this->db->createCommand(
+            'SELECT "_Field-recid", "_Index-Seq"
+            FROM "_Index-Field"
+            WHERE "_index-recid" = :index',
+            [':index' => $index]
+        )->queryAll();
+        if (empty($fieldRecs)) {
+            return;
+        }
+
+        $arrHelper = new \yii\helpers\ArrayHelper;
+        $arrHelper::multisort($fieldRecs, '_Index-Seq');
+        $query = new yii\db\Query();
+        $fields = $query->select('"_field-name", ROWID')
+            ->from('"_field"')
+            ->where(['in', 'ROWID', $arrHelper::getColumn($fieldRecs, "_Field-recid")])
+            ->all($this->db);
+        foreach ($fieldRecs AS $field) {
+            foreach ($fields AS &$f) {
+                if ((int)$f['ROWID'] === (int)$field['_Field-recid']) {
+                    $table->primaryKey[] = $f['_Field-Name'];
+                    unset($f);
+                }
+            }
+        }
     }
 
     /**
