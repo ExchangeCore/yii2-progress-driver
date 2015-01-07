@@ -234,6 +234,7 @@ class Schema extends yii\db\Schema
      */
     protected function findPrimaryKeys($table)
     {
+        $table->primaryKey = [];
         $primeIndex = $this->db->createCommand(
             'SELECT "_Prime-Index"
             FROM "_File"
