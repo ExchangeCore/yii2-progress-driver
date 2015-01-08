@@ -65,10 +65,16 @@ class Schema extends yii\db\Schema
     ];
 
     /**
-     * Quotes a table name for use in a query.
-     * A simple table name has no schema prefix.
-     * @param string $name table name.
-     * @return string the properly quoted table name.
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->db->enableSavepoint = false;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function quoteSimpleTableName($name)
     {
@@ -76,8 +82,7 @@ class Schema extends yii\db\Schema
     }
 
     /**
-     * Creates a query builder for the MSSQL database.
-     * @return QueryBuilder query builder interface.
+     * @inheritdoc
      */
     public function createQueryBuilder()
     {
@@ -85,9 +90,7 @@ class Schema extends yii\db\Schema
     }
 
     /**
-     * Loads the metadata for the specified table.
-     * @param string $name table name
-     * @return yii\db\TableSchema|null driver dependent table metadata. Null if the table does not exist.
+     * @inheritdoc
      */
     public function loadTableSchema($name)
     {
@@ -294,10 +297,7 @@ class Schema extends yii\db\Schema
     }
 
     /**
-     * Returns all table names in the database.
-     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
-     * @throws \yii\base\NotSupportedException
-     * @return array all table names in the database. The names have NO schema name prefix.
+     * @inheritdoc
      */
     protected function findTableNames($schema = '')
     {
@@ -313,5 +313,13 @@ class Schema extends yii\db\Schema
         ";
 
         return $this->db->createCommand($sql, [':schema' => $schema])->queryColumn();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTransactionIsolationLevel($level)
+    {
+        $this->db->createCommand("SET TRANSACTION ISOLATION LEVEL $level")->execute();
     }
 }
