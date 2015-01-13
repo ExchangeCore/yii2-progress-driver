@@ -29,7 +29,7 @@ class Schema extends yii\db\Schema
         'smallint' => self::TYPE_SMALLINT,
         'decimal' => self::TYPE_DECIMAL,
         'smallmoney' => self::TYPE_MONEY,
-        'int' => self::TYPE_INTEGER,
+        'integer' => self::TYPE_INTEGER,
         'tinyint' => self::TYPE_SMALLINT,
         'money' => self::TYPE_MONEY,
         // approximate numbers
@@ -245,7 +245,7 @@ class Schema extends yii\db\Schema
             ',
             [':tableName' => $table->name]
         )->queryScalar();
-        if (is_null($primeIndex)) {
+        if (is_null($primeIndex) || $primeIndex === false) {
             return;
         }
 
@@ -256,7 +256,7 @@ class Schema extends yii\db\Schema
             ',
             [':primeIndex' => $primeIndex]
         )->queryScalar();
-        if (is_null($index)) {
+        if (is_null($index) || $index === false) {
             return;
         }
 
