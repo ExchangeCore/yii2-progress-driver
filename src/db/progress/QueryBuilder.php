@@ -88,4 +88,3 @@ class QueryBuilder extends \yii\db\QueryBuilder
         return '(' . implode($operator === 'IN' ? ' OR ' : ' AND ', $vss) . ')';
     }
 }
-}
