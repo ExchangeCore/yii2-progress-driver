@@ -3,15 +3,8 @@ namespace exchangecore\yii2\progress\driver\db\progress;
 
 use yii;
 use yii\db\TableSchema;
-use yii\base\NotSupportedException;
 use yii\db\ColumnSchema;
 
-/**
- * Schema is the class for retrieving metadata from a MS SQL Server databases (version 2008 and above).
- *
- * @author Timur Ruziev <resurtm@gmail.com>
- * @since 2.0
- */
 class Schema extends yii\db\Schema
 {
     /**
@@ -64,6 +57,10 @@ class Schema extends yii\db\Schema
         'table' => self::TYPE_STRING,
     ];
 
+    public $collationCaseMap = [
+        'basic_I' => CASE_UPPER,
+    ];
+
     /**
      * @inheritdoc
      */
@@ -78,7 +75,7 @@ class Schema extends yii\db\Schema
      */
     public function quoteSimpleTableName($name)
     {
-        return $name;
+        return strpos($name, '"') !== false ? $name : '"' . $name . '"';
     }
 
     /**
@@ -133,6 +130,11 @@ class Schema extends yii\db\Schema
         }
     }
 
+    protected function createColumnSchema()
+    {
+        return Yii::createObject('exchangecore\yii2\progress\driver\db\progress\ColumnSchema');
+    }
+
     /**
      * Loads the column information into a [[ColumnSchema]] object.
      * @param array $info column information
@@ -175,7 +177,7 @@ class Schema extends yii\db\Schema
                 }
             }
         }
-
+        $column->case = $this->getCollationCase($info['COLLATION']);
         $column->phpType = $this->getColumnPhpType($column);
 
         if (!$column->isPrimaryKey && ($column->type !== 'timestamp' || $info['DFLT_VALUE'] !== 'CURRENT_TIMESTAMP')) {
@@ -183,6 +185,19 @@ class Schema extends yii\db\Schema
         }
 
         return $column;
+    }
+
+    /**
+     * @param string $collation
+     * @returns false if collation is case sensitive, CASE_UPPER if value should be converted to uppercase, CASE_LOWER
+     * if value should be converted to lower case
+     */
+    protected function getCollationCase($collation)
+    {
+        if(isset($this->collationCaseMap[$collation])) {
+            return $this->collationCaseMap[$collation];
+        }
+        return CASE_UPPER;
     }
 
     /**
@@ -201,7 +216,7 @@ class Schema extends yii\db\Schema
         }
         $sql = "
         SELECT
-            t1.COL, t1.NULLFLAG, t1.COLTYPE, t1.DFLT_VALUE, t1.LABEL, t1.WIDTH
+            t1.COL, t1.NULLFLAG, t1.COLTYPE, t1.DFLT_VALUE, t1.LABEL, t1.WIDTH, t1.COLLATION
         FROM {$columnsTableName} AS t1
         WHERE {$whereSql}
         ";
