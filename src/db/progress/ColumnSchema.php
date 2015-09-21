@@ -19,6 +19,6 @@ class ColumnSchema extends \yii\db\ColumnSchema
                 $value = strtoupper($value);
             }
         }
-        return $value;
+        return utf8_encode($value);
     }
 } 
