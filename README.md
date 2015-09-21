@@ -29,7 +29,6 @@ will now need to use the modified connection class. Here is a sample of connecti
        'dsn' => 'odbc:MyProgressDb',
        'username' => 'testuser',
        'password' => 'testpass',
-       'charset' => 'utf8',
    ];
 ```
 
